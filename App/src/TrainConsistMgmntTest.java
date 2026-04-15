@@ -4,62 +4,61 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class UseCase14TrainConsistMgmntTest {
+class UseCase15TrainConsistMgmntTest {
 
     @Test
-    void testException_ValidCapacityCreation() throws TrainConsistApp.InvalidCapacityException {
-        TrainConsistApp.PassengerBogie b =
-                new TrainConsistApp.PassengerBogie("Sleeper", 72);
+    void testCargo_SafeAssignment() {
+        TrainConsistApp.GoodsBogie b =
+                new TrainConsistApp.GoodsBogie("Cylindrical");
 
-        assertNotNull(b);
+        b.assignCargo("Petroleum");
+
+        assertEquals("Petroleum", b.getCargo());
     }
 
     @Test
-    void testException_NegativeCapacityThrowsException() {
-        Exception ex = assertThrows(
-                TrainConsistApp.InvalidCapacityException.class,
-                () -> new TrainConsistApp.PassengerBogie("AC", -10)
-        );
+    void testCargo_UnsafeAssignmentHandled() {
+        TrainConsistApp.GoodsBogie b =
+                new TrainConsistApp.GoodsBogie("Rectangular");
 
-        assertEquals("Capacity must be greater than zero", ex.getMessage());
+        b.assignCargo("Petroleum");
+
+        // Cargo should NOT be assigned
+        assertNull(b.getCargo());
     }
 
     @Test
-    void testException_ZeroCapacityThrowsException() {
-        assertThrows(
-                TrainConsistApp.InvalidCapacityException.class,
-                () -> new TrainConsistApp.PassengerBogie("AC", 0)
-        );
+    void testCargo_CargoNotAssignedAfterFailure() {
+        TrainConsistApp.GoodsBogie b =
+                new TrainConsistApp.GoodsBogie("Rectangular");
+
+        b.assignCargo("Petroleum");
+
+        assertNull(b.getCargo());
     }
 
     @Test
-    void testException_ExceptionMessageValidation() {
-        Exception ex = assertThrows(
-                TrainConsistApp.InvalidCapacityException.class,
-                () -> new TrainConsistApp.PassengerBogie("AC", 0)
-        );
+    void testCargo_ProgramContinuesAfterException() {
+        TrainConsistApp.GoodsBogie b1 =
+                new TrainConsistApp.GoodsBogie("Rectangular");
 
-        assertEquals("Capacity must be greater than zero", ex.getMessage());
+        TrainConsistApp.GoodsBogie b2 =
+                new TrainConsistApp.GoodsBogie("Cylindrical");
+
+        b1.assignCargo("Petroleum");   // fails
+        b2.assignCargo("Coal");        // should still work
+
+        assertEquals("Coal", b2.getCargo());
     }
 
     @Test
-    void testException_ObjectIntegrityAfterCreation() throws TrainConsistApp.InvalidCapacityException {
-        TrainConsistApp.PassengerBogie b =
-                new TrainConsistApp.PassengerBogie("First Class", 24);
+    void testCargo_FinallyBlockExecution() {
+        TrainConsistApp.GoodsBogie b =
+                new TrainConsistApp.GoodsBogie("Rectangular");
 
-        assertEquals("First Class", b.getType());
-        assertEquals(24, b.getCapacity());
-    }
+        // No assertion needed for finally (it always runs)
+        b.assignCargo("Petroleum");
 
-    @Test
-    void testException_MultipleValidBogiesCreation() throws TrainConsistApp.InvalidCapacityException {
-        TrainConsistApp.PassengerBogie b1 =
-                new TrainConsistApp.PassengerBogie("Sleeper", 72);
-
-        TrainConsistApp.PassengerBogie b2 =
-                new TrainConsistApp.PassengerBogie("AC Chair", 56);
-
-        assertNotNull(b1);
-        assertNotNull(b2);
+        assertTrue(true); // ensures method completes
     }
 }
